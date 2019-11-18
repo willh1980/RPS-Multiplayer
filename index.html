@@ -1,0 +1,262 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+                <title>Multiplayer Rocks Paper Scissors</title>
+            
+                <!-- CSS reset sheet -->
+                <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/meyer-reset/2.0/reset.css">
+            
+                <!-- Our Own CSS File -->
+                <link rel="stylesheet" href="./css/style.css">
+            
+                <!-- Firebase References -->
+                <script src="https://www.gstatic.com/firebasejs/6.0.4/firebase-app.js"></script>
+                <script src="https://www.gstatic.com/firebasejs/6.0.4/firebase-database.js"></script>
+            
+</head>
+            
+<body>
+    <h1>Rock, Paper, Scissors!!!!!!!</h1>
+    <br>
+    <br>
+    <div class="grid" id="container">
+        <div id="pictureleft">
+            <img id="picleft" src= "./images/rock-left.jpg">                
+            <p class="playerinfo">
+                <br>
+                Player 1: <span id="player1"></span>
+                <br>
+                <br>
+                Player1's victories in session: <span id="player1vic"></span>
+                <br>
+            </p>
+        </div>
+        <div id="chatbox">
+            <h2>Live Chatbox</h2>
+            <br>
+            <br>
+        </div>
+        <div id="pictureright">
+            <img id="picright" src= "./images/rock-right.jpg">
+                <p class="playerinfo">
+                    <br>
+                    Player 2: <span id="player2"></span>
+                    <br>
+                    <br>
+                    Player2's victories in session: <span id="player2vic"></span>
+
+                </p>
+        </div>
+    </div>
+    <br>
+    <br>
+    <div class="grid2" id="container2">
+        <div>
+            <div id=player1start>
+                Type name here and press enter to start game: <input type="text" name="Player Name" id="name1">
+            </div>
+            <br>
+            <br>
+            <div>
+                Chat: <input type="text" id="chatinput1"> <input type="submit" value="Send Message" id="chat-send1">
+            </div>
+            <br>
+            <br>
+            <div id=player1choice>
+                <input type="radio" name="choice" value="3">Rock 
+                <input type="radio" name="choice" value="1">Paper
+                <input type="radio" name="choice" value="2">Scissors <button id="p1choice">Submit</button>
+            </div>
+        </div>
+        <div></div>
+        <div>
+            <div id="player2start">
+                Type name here and press enter to contest player 1: <input type="text" name="Player Name" id="name2">
+            </div>
+            <br>
+            <br>
+            <div>
+               Chat: <input type="text" id="chatinput2"> <input type="submit" value="Send Message" id="chat-send2">
+            </div>
+            <br>
+            <br>
+            <div id=player2choice>
+                <input type="radio" name="choice" value="3">Rock 
+                <input type="radio" name="choice" value="1">Paper
+                <input type="radio" name="choice" value="2">Scissors  <button id="p2choice">Submit</button>
+            </div>
+        </div>
+    </div>     
+    
+            
+    
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+
+    <script src="https://www.gstatic.com/firebasejs/6.3.4/firebase.js"></script>
+
+    <script>
+
+        var firebaseConfig = {
+            apiKey: "AIzaSyD4H4_C0lF5NRq0gkSqfkHuKiE-MfItImQ",
+            authDomain: "willyproject-1980.firebaseapp.com",
+            databaseURL: "https://willyproject-1980.firebaseio.com",
+            projectId: "willyproject-1980",
+            storageBucket: "",
+            messagingSenderId: "804622655840",
+            appId: "1:804622655840:web:000e60d424025c57"
+        };
+        // Initialize Firebase
+        firebase.initializeApp(firebaseConfig);
+
+        var database = firebase.database();
+        var chatData = database.ref("/chat");
+        var playersRef = database.ref("players");
+        var currentTurnRef = database.ref("turn");
+        var username = "Guest";
+        var username2 = "Guest";
+        
+        
+
+        function capitalize(name) {
+        return name.charAt(0).toUpperCase() + name.slice(1);
+        }
+
+
+         //Function to create player1 and save username
+         $("#name1").keypress(function(e) {
+            if (e.which === 13 && $("#name1").val() !== "") {
+                username = capitalize($("#name1").val());
+                $("#player1").html(username)
+                $("#player1start").hide()
+            }
+        });
+
+        //Function to create player2 and save username
+        $("#name2").keypress(function(e) {
+            if (e.which === 13 && $("#name2").val() !== "" && $("#player1").html() !== "") {
+                username2 = capitalize($("#name2").val());
+                $("#player2").html(username2)
+                $("#player2start").hide()
+            }
+        });
+
+
+        //Function to send chat from player one to the page and to the database using button click.
+        $("#chat-send1").click(function() {
+            if ($("#chatinput1").val() !== "") {
+                var message = $("#chatinput1").val();
+                $("#chatbox").append("<span>" + username + ": " + message + "</span><br><br>") 
+
+                chatData.push({
+                name: username,
+                message: message,
+                time: firebase.database.ServerValue.TIMESTAMP,
+                });
+
+                $("#chatinput1").val("");
+            }
+        });
+
+
+        //Function to send chat from player two to the page and to the database using button click.
+        $("#chat-send2").click(function() {
+            if ($("#chatinput2").val() !== "") {
+                var message = $("#chatinput2").val();
+                $("#chatbox").append("<span>" + username2 + ": " + message + "</span><br><br>") 
+
+                chatData.push({
+                name: username2,
+                message: message,
+                time: firebase.database.ServerValue.TIMESTAMP,
+                });
+
+                $("#chatinput2").val("");
+            }
+        });
+
+        // Chatbox input listener
+
+        //Function to send chat from player one to the page and to the database using keypress enter.
+        $("#chatinput1").keypress(function(e) {
+            if (e.which === 13 && $("#chatinput1").val() !== "") {
+                var message = $("#chatinput1").val();
+                $("#chatbox").append("<span>" + username + ": " + message + "</span><br><br>") 
+                
+                chatData.push({
+                name: username,
+                message: message,
+                time: firebase.database.ServerValue.TIMESTAMP,
+                });
+
+                $("#chatinput1").val("");
+            }
+        });
+
+        //Function to send chat from player two to the page and to the database using keypress enter.
+        $("#chatinput2").keypress(function(e) {
+            if (e.which === 13 && $("#chatinput2").val() !== "") {
+                var message = $("#chatinput2").val();
+                $("#chatbox").append("<span>" + username2 + ": " + message + "</span><br><br>") 
+                
+                chatData.push({
+                name: username2,
+                message: message,
+                time: firebase.database.ServerValue.TIMESTAMP,
+                });
+
+                $("#chatinput2").val("");
+            }
+        });
+
+        //Function to try to cross compare players' guesses with radio buttons. was not about to complete the game logic behind this part.
+        $("#p2choice").on("click", function() {
+                var result = $("input[type='radio']:checked")
+                if(result.length == 2) {
+                    var choiceFirst = $('input[name="choice"]:checked')
+                    var choiceSecond = $('input[name="choice2"]:checked')
+                    console.log(parseInt(choiceFirst.val()))
+                    console.log(parseInt(choiceSecond.val()))
+
+                    if(parseInt(choiceFirst.val()) > parseInt(choiceSecond.val()) && parseInt(choiceFirst.val()) - parseInt(choiceSecond.val()) != 2){
+                        alert("Choice 1 winner");
+                        $('input[name="choice"]').prop('checked', false);
+                        $('input[name="choice2"]').prop('checked', false);
+                    }
+
+                    else if(parseInt(choiceFirst.val()) == parseInt(choiceSecond.val())) {
+                        alert("Stalemate!")
+                        $('input[name="choice"]').prop('checked', false);
+                        $('input[name="choice2"]').prop('checked', false);
+                    }
+
+                    else if(parseInt(choiceFirst.val()) - parseInt(choiceSecond.val()) == -2) {
+                        alert("choice 1 winner!")
+                        $('input[name="choice"]').prop('checked', false);
+                        $('input[name="choice2"]').prop('checked', false);
+                    }
+
+                    else {
+                        alert("choice 2 winner")
+                        $('input[name="choice"]').prop('checked', false);
+                        $('input[name="choice2"]').prop('checked', false);
+                    }
+                }
+
+                else if(result.length == 1) {
+                    alert("Only one player has selected, please try again.");
+                }
+
+                else if(result.length == 0) {
+                    alert("You need to make a selection, player 2")
+                }
+                
+            })
+       
+    </script>
+
+</body>
+
+</html>
