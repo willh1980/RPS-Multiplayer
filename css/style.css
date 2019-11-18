@@ -1,0 +1,40 @@
+.grid {
+    display: grid;
+    grid-template-columns: 480px 460px 480px;
+    height: 420px;
+}
+
+
+#container {
+    margin-left: 10px;
+}
+
+#chatbox{
+    border: 1px solid green;
+    padding: 10px;
+}
+
+.playerinfo{
+    padding: 5px;
+}
+
+h1 {
+ text-align: center;
+ font-weight: bold;
+ font-size: 36px;
+}
+
+h2 {
+    text-align: center;
+    font-weight: bold;
+    font-size: 24px;
+}
+
+.grid2 {
+    display: grid;
+    grid-template-columns: 480px 460px 480px;
+}
+
+#container2 {
+    margin-left: 10px;
+}

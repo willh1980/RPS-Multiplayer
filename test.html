@@ -1,0 +1,177 @@
+<!DOCTYPE html>
+<html lang="en">
+    
+    <head>
+        <meta charset="UTF-8" />
+
+        <link rel="stylesheet" type="text/css" href="./css/HW7-3.css" />
+        <title>Radios</title>
+    
+    </head>
+
+    <body>
+        <h1>Rock, Paper, Scissors!!!!!!!</h1>
+        <br>
+        <br>
+        <div id="picturediv">
+            <div id="pictureleft">
+                <img src= "./images/rock-left.jpg">                
+                <p>
+                    <br>
+                    Player 1: <span class="player1">Player1</span>
+                    <br>
+                    <br>
+                    <span class="player1">Player1</span>'s victories in session: <span id="player1vic"></span>
+                    <br>
+
+                </p>
+            </div>
+            <div id="chatbox">
+                <h1>Live Chatbox</h1>
+                <br>
+            </div>
+            <div id="pictureright">
+                <img src= "./images/rock-right.jpg">
+                <p>
+                    <br>
+                    Player 2: <span class="player2">Player2</span>
+                    <br>
+                    <br>
+                    <span class="player2">Player2</span>'s victories in session: <span id="player2vic"></span>
+
+                </p>
+            </div>
+        </div>
+        <br>
+        <div>
+            <input type="namebox">
+        </div>
+        <br>
+        <div>
+            <input type="text" id="chatinput">
+
+            <button id="submit-chat">submit message</button>
+        </div>
+        <div>
+            <div id=player1choice>
+                <input type="radio" name="choice" value="3">Rock 
+                <input type="radio" name="choice" value="1">Paper
+                <input type="radio" name="choice" value="2">Scissors
+            </div>
+            <br>
+            <br>
+            <br>
+            <div id=player2choice>
+                <input type="radio" name="choice2" value="3">Rock 
+                <input type="radio" name="choice2" value="1">Paper
+                <input type="radio" name="choice2" value="2">Scissors
+            </div>
+            <br>
+            <input type="submit" value="Submit" id="submit">
+            
+        </div>
+
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+
+        <script src="https://www.gstatic.com/firebasejs/6.3.4/firebase.js"></script>
+        
+        <script type= text/javascript>
+
+            var firebaseConfig = {
+                apiKey: "AIzaSyD4H4_C0lF5NRq0gkSqfkHuKiE-MfItImQ",
+                authDomain: "willyproject-1980.firebaseapp.com",
+                databaseURL: "https://willyproject-1980.firebaseio.com",
+                projectId: "willyproject-1980",
+                storageBucket: "",
+                messagingSenderId: "804622655840",
+                appId: "1:804622655840:web:000e60d424025c57"
+            };
+            
+            firebase.initializeApp(firebaseConfig);
+            
+            var database = firebase.database();
+
+
+            var database = firebase.database();
+            var chatData = database.ref("/chat");
+            var playersRef = database.ref("players");
+            var currentTurnRef = database.ref("turn");
+            var username = "Guest";
+            var currentPlayers = null;
+            var currentTurn = null;
+            var playerNum = false;
+            var playerOneExists = false;
+            var playerTwoExists = false;
+            var playerOneData = null;
+            var playerTwoData = null;
+
+
+            
+            $("#submit-chat").on("click", function() {
+                if ($("#chat-input").val() !== "") {
+                    $("#chatbox").append("<br>" + $("#chatinput").val())
+                    var message = $("#chat-input").val();
+
+                    chatData.push({
+                    name: username,
+                    message: message,
+                    time: firebase.database.ServerValue.TIMESTAMP,
+                    idNum: playerNum
+                    });
+
+                    $("#chatinput").val("");
+                }
+                
+               
+            })
+            
+            $("#submit").on("click", function() {
+                var result = $("input[type='radio']:checked")
+                if(result.length == 2) {
+                    var choiceFirst = $('input[name="choice"]:checked')
+                    var choiceSecond = $('input[name="choice2"]:checked')
+                    console.log(parseInt(choiceFirst.val()))
+                    console.log(parseInt(choiceSecond.val()))
+
+                    if(parseInt(choiceFirst.val()) > parseInt(choiceSecond.val()) && parseInt(choiceFirst.val()) - parseInt(choiceSecond.val()) != 2){
+                        alert("Choice 1 winner");
+                        $('input[name="choice"]').prop('checked', false);
+                        $('input[name="choice2"]').prop('checked', false);
+                    }
+
+                    else if(parseInt(choiceFirst.val()) == parseInt(choiceSecond.val())) {
+                        alert("Stalemate!")
+                        $('input[name="choice"]').prop('checked', false);
+                        $('input[name="choice2"]').prop('checked', false);
+                    }
+
+                    else if(parseInt(choiceFirst.val()) - parseInt(choiceSecond.val()) == -2) {
+                        alert("choice 1 winner!")
+                        $('input[name="choice"]').prop('checked', false);
+                        $('input[name="choice2"]').prop('checked', false);
+                    }
+
+                    else {
+                        alert("choice 2 winner")
+                        $('input[name="choice"]').prop('checked', false);
+                        $('input[name="choice2"]').prop('checked', false);
+                    }
+                }
+
+                else {
+                    return;
+                }
+                
+            })
+
+
+
+
+          
+          
+
+        </script>
+    
+
+    </body>
+</html>
